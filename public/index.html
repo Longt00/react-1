@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
+
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="description" content="Web site created using create-react-app" />
+        <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+        <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
+        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
@@ -24,12 +22,28 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.css">
+        <!-- <link rel="stylesheet" href="style.css"> -->
+        <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@1.7.1/dist/chartjs-plugin-streaming.min.js"></script>
+        <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.js"></script>
+        <script src="./heatmap.js"></script>
+        <!-- <script src="./chartjs.js"></script> -->
+        <title>React App</title>
+    </head>
+
+    <body>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="root">
+        </div>
+        <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -39,5 +53,120 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-  </body>
+    </body>
+    <script>
+        function initPerformanceTab () {
+            function createTemperaturesLineChart () {
+                const ctx = document
+                    .getElementById("engine-temperture-line-chart")
+                    .getContext("2d");
+
+                const chart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        datasets: [
+                            {
+                                label: "Temperture",
+                                borderColor: "rgba(255, 192, 0, 1.0)",
+                                backgroundColor: "rgba(255, 192, 0, 0.5)",
+                                data: [],
+                            },
+                        ],
+                    },
+                    options: {
+                        scales: {
+                            xAxes: [{ type: "realtime", realtime: { delay: 2000 } }],
+                            yAxes: [{ ticks: { beginAtZero: true } }],
+                        },
+                        legend: {
+                            display: false,
+                        },
+                    },
+                });
+                return chart;
+            } // 温度折线图
+
+            function createHumidityChart () {
+                const ctx = document
+                    .getElementById("engine-humidity-chart")
+                    .getContext("2d");
+                Chart.defaults.global.defaultFontColor = "rgb(255,255,255)"; // 定义字体颜色
+                const chart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        datasets: [
+                            {
+                                label: "humidity",
+                                borderColor: "rgba(255, 192, 0, 1.0)",
+                                backgroundColor: "rgba(255, 192, 0, 0.5)",
+                                fill: 1,
+                                data: [],
+                            },
+                            {
+                                label: "standard",
+                                borderColor: "rgba(192, 128, 0, 1.0)",
+                                fill: 0,
+                                data: [],
+                            },
+                        ],
+                    },
+                    options: {
+                        scales: {
+                            xAxes: [{ type: "realtime", realtime: { delay: 2000 } }],
+                            yAxes: [{ ticks: { beginAtZero: true } }],
+                        },
+                        plugins: {
+                            filler: {
+                                propagate: true,
+                            },
+                        },
+                        legend: {
+                            display: false,
+                        },
+                    },
+                });
+                return chart;
+            } // 湿度折线图
+
+            const datas = [];
+            function data () {
+                $.ajax({
+                    url: "http://114.119.185.166:6080/axes_app1/llz/",
+                    async: true, //异步接受
+                    type: "get",
+                    cache: false,
+                    success: function (data) {
+                        datas.splice(0, 1, data[0].temperature / 100);
+                        datas.splice(1, 1, data[0].temperature / 100);
+
+                    },
+                });
+            }
+
+            function refreshTemperature (chart) {
+                const date = Date.now();
+                chart.data.datasets[0].data.push({ x: date, y: datas[0] });
+            } //定义'自定义温度折线图'数据
+
+            function refreshHumidityature (chart) {
+                const date = Date.now();
+                chart.data.datasets[0].data.push({ x: date, y: datas[1] });
+            } //定义'自定义亮度折线图'数据
+
+            const engineTemperaturesLineChart = createTemperaturesLineChart();
+            const engineHumidityChart = createHumidityChart();
+
+            setInterval(function () {
+                data();
+                refreshTemperature(engineTemperaturesLineChart);
+                refreshHumidityature(engineHumidityChart);
+            }, 2000); //延迟为2s
+        }
+        window.onload = () => {
+            initPerformanceTab()
+        };
+
+
+    </script>
+
 </html>

@@ -1,0 +1,19 @@
+#header {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+}
+
+#header > * {
+	padding: 0.5em;
+}
+
+#header > img {
+	height: 80px;
+	box-sizing: content-box;
+}
+
+#header > h {
+	font-size: 2em;
+}
+
