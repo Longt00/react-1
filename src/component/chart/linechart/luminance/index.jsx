@@ -1,6 +1,6 @@
 import React from "react";
 
-function LuminancePage() {
+function LuminanceChart() {
 	return (
 		<>
 			<div className="col-md-3 col-lg-4 card">
@@ -10,4 +10,4 @@ function LuminancePage() {
 		</>
 	);
 }
-export default LuminancePage
+export default LuminanceChart

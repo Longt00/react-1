@@ -1,6 +1,6 @@
 import React from "react";
 import TempreatureChart from "./tempreature";
-import LuminancePage from "./luminance";
+import LuminanceChart from "./luminance";
 function LineChart() {
 	return (
 		<>
@@ -8,7 +8,7 @@ function LineChart() {
 				<div className="carousel-inner">
 					<div className="row">
 						<TempreatureChart></TempreatureChart>
-						<LuminancePage></LuminancePage>
+						<LuminanceChart></LuminanceChart>
                      
 					</div>
 				</div>
