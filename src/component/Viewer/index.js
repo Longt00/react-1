@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"; //引入React模块
 import "./index.css"; //引入CSS样式表
 import $ from "jquery"; //引入JQuery模块
+import HeatmapExtension from '../heatmap'
 
 let datas = []; //定义数组变量
 const { Autodesk } = window; //定义Autodesk对象
@@ -60,19 +61,22 @@ function Viewer() {
     //定义一个Viewer组件，用来展示Autodesk Viewer
     useEffect(() => {
         Autodesk.Viewing.Initializer(options, () => {
-            var htmlDiv = document.getElementById("forgeViewer"); //获取要展示Viewer的div
+            var htmlDiv = document.getElementById("forgeViewer");
             viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv, {
-                extensions: ["HeatmapExtension"], //加载HeatmapExtension扩展，用来展示热力图
-           
-			});
-            viewer.start(); //启动Viewer
-            loadModel(urn); //加载模型
+                extensions: ["HeatmapExtension"], // 加载 HeatmapExtension 扩展
+            });
+
+            // 注册并加载 HeatmapExtension
+            Autodesk.Viewing.theExtensionManager.registerExtension("HeatmapExtension", HeatmapExtension);
+            viewer.start();
+            loadModel(urn);
         });
         setInterval(() => {
             $.ajax({
                 url: "http://114.119.185.166:6080/axes_app1/llz/",
-                async: false,
+                async: true,
                 type: "get",
+                cache:false,
                 success: function (data) {
                     datas.splice(0, 1, data[0].temperature / 100); //将从API获取的数据保存到datas数组中
                 },
