@@ -24,6 +24,7 @@ function TemperatureChart() {
 					],
 				},
 				options: {
+                    events: [],
 					scales: {
 						xAxes: [{ type: "realtime", realtime: { delay: 2000 } }],
 						yAxes: [{ ticks: { beginAtZero: true } }],

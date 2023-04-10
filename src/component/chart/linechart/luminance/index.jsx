@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import Chart from "chart.js";
 import "chartjs-plugin-streaming";
 import $ from "jquery";
+
 function HumidityChart() {
 	useEffect(() => {
 		const createHumidityChart = () => {
@@ -30,6 +31,7 @@ function HumidityChart() {
 					],
 				},
 				options: {
+                    events: [],
 					scales: {
 						xAxes: [{ type: "realtime", realtime: { delay: 2000 } }],
 						yAxes: [{ ticks: { beginAtZero: true } }],
